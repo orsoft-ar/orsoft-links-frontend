@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { CookieBanner } from '@/components/ui/CookieBanner';
+import { initAnalytics } from '@/utils/analytics';
 import { ProtectedRoute, PublicOnlyRoute } from '@/router/guards';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { LandingPage } from '@/pages/LandingPage';
@@ -37,5 +39,11 @@ const router = createBrowserRouter([
 ]);
 
 export function App() {
-  return <RouterProvider router={router} />;
+  initAnalytics();
+  return (
+    <>
+      <RouterProvider router={router} />
+      <CookieBanner />
+    </>
+  );
 }
