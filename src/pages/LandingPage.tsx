@@ -187,7 +187,7 @@ export function LandingPage() {
               Preguntas frecuentes
             </a>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isAuthenticated ? (
               <Link to="/dashboard">
                 <Button variant="secondary" size="sm">
@@ -197,7 +197,11 @@ export function LandingPage() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="px-2.5 sm:px-3"
+                  >
                     Iniciar sesión
                   </Button>
                 </Link>

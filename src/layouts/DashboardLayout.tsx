@@ -79,7 +79,7 @@ function DashboardShell() {
         )}
       </aside>
 
-      <main className="flex-1 px-5 py-6 lg:px-10 lg:py-8">
+      <main className="flex-1 px-4 py-6 sm:px-5 lg:px-10 lg:py-8">
         <Outlet />
       </main>
     </div>

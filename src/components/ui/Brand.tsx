@@ -40,9 +40,9 @@ export function OrSoftLogo({ className = '' }: { className?: string }) {
       <img
         src="/logo.png"
         alt="logo de linkorsoft.site"
-        className="h-9 w-auto"
+        className="h-8 w-auto sm:h-9"
       />
-      <span className="text-xl font-extrabold tracking-tight text-navy">
+      <span className="hidden text-xl font-extrabold tracking-tight text-navy sm:inline">
         linkorsoft<span className="text-coral">.site</span>
       </span>
     </div>

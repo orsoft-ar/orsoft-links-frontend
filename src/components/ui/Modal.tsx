@@ -12,13 +12,13 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-navy/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg rounded-2xl bg-cream p-6 shadow-2xl ring-1 ring-slate/10">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="relative z-10 flex max-h-[90vh] w-full flex-col rounded-t-2xl bg-cream p-5 shadow-2xl ring-1 ring-slate/10 sm:max-h-[80vh] sm:max-w-lg sm:rounded-2xl sm:p-6">
+        <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-navy">{title}</h2>
           <button
             onClick={onClose}
@@ -36,8 +36,8 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
             </svg>
           </button>
         </div>
-        <div className="max-h-[70vh] overflow-y-auto">{children}</div>
-        {footer && <div className="mt-6 flex justify-end gap-3">{footer}</div>}
+        <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-4">{children}</div>
+        {footer && <div className="flex justify-end gap-3 pt-1">{footer}</div>}
       </div>
     </div>
   );

@@ -238,7 +238,7 @@ export function DashboardPage() {
     <div className="grid gap-8 xl:grid-cols-[1fr_380px]">
       <div className="space-y-10">
         <section>
-          <div className="mb-5 flex items-center justify-between">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-2xl font-bold text-navy">Mi página</h1>
           </div>
           <div className="rounded-2xl border border-slate/10 bg-white p-6 shadow-sm">
@@ -269,7 +269,7 @@ export function DashboardPage() {
         </section>
 
         <section>
-          <div className="mb-5 flex items-center justify-between">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-bold text-navy">Links</h2>
             <Button onClick={() => { setEditingLink(null); setLinkError(null); setCreateLinkOpen(true); }}>
               <Plus className="h-4 w-4" />
