@@ -150,15 +150,31 @@ function escapeJsonLd(value) {
   return value.replace(/<\/script/g, '<\\/script');
 }
 
+function buildSitemapXml(usernames, lastModified) {
+  const url = (loc, priority, changefreq = 'weekly') =>
+    `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastModified}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  const entries = [
+    url(`${SITE_URL}/`, '1.0'),
+    url(`${SITE_URL}/login`, '0.3'),
+    url(`${SITE_URL}/register`, '0.5'),
+    ...usernames.map((username) => url(`${SITE_URL}/${username}`, '0.8')),
+  ];
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+}
+
 async function main() {
   const template = readFileSync(path.join(DIST, 'index.html'), 'utf8');
   const usernames = await getSitemapUsernames();
   console.log(`Pre-renderizando ${usernames.length} perfiles publicos de ${SITE_URL}...`);
+  const uniqueUsernames = [...new Set(usernames)];
+
+  const lastModified = new Date().toISOString();
+  writeFileSync(path.join(DIST, 'sitemap.xml'), buildSitemapXml(uniqueUsernames, lastModified), 'utf8');
 
   let generated = 0;
   let skipped = 0;
 
-  for (const username of [...new Set(usernames)]) {
+  for (const username of uniqueUsernames) {
     try {
       const profile = await getProfile(username);
       if (!profile) {
