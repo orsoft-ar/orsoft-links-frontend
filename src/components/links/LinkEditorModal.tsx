@@ -12,11 +12,13 @@ interface LinkFormValues {
   url: string;
   icon: string;
   whatsappNumber: string;
+  emailAddress: string;
 }
 
 type LinkSubmitValues = Pick<LinkFormValues, 'title' | 'url' | 'icon'>;
 
 const WHATSAPP_URL_RE = /^https?:\/\/wa\.me\/(\d+)/;
+const MAILTO_RE = /^mailto:([^?]+)/;
 
 interface LinkEditorModalProps {
   open: boolean;
@@ -40,6 +42,7 @@ export function LinkEditorModal({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<LinkFormValues>({
     defaultValues: {
@@ -47,33 +50,53 @@ export function LinkEditorModal({
       url: link?.url ?? '',
       icon: link?.icon ?? 'globe',
       whatsappNumber: getWhatsappNumber(link),
+      emailAddress: getEmailAddress(link),
     },
     values: {
       title: link?.title ?? '',
       url: link?.url ?? '',
       icon: link?.icon ?? 'globe',
       whatsappNumber: getWhatsappNumber(link),
+      emailAddress: getEmailAddress(link),
     },
   });
 
   const isEditing = Boolean(link);
   const selectedIcon = watch('icon');
   const isWhatsapp = selectedIcon === 'whatsapp';
+  const isMail = selectedIcon === 'mail';
   const [waMode, setWaMode] = useState<'number' | 'url'>(
     getWhatsappNumber(link) ? 'number' : 'url',
   );
+  const [mailMode, setMailMode] = useState<'email' | 'url'>(
+    getEmailAddress(link) ? 'email' : 'url',
+  );
 
   const submit = handleSubmit((values) => {
-    const url =
-      isWhatsapp && waMode === 'number' && values.whatsappNumber.trim()
-        ? buildWhatsappUrl(values.whatsappNumber)
-        : values.url;
+    let url = values.url;
+    if (isWhatsapp && waMode === 'number' && values.whatsappNumber.trim()) {
+      url = buildWhatsappUrl(values.whatsappNumber);
+    } else if (isMail && mailMode === 'email' && values.emailAddress.trim()) {
+      url = buildMailtoUrl(values.emailAddress);
+    }
     onSubmit({
       title: values.title,
       icon: values.icon,
       url,
     });
   });
+
+  const handleIconChange = (iconValue: string) => {
+    const isNewIcon = iconValue !== selectedIcon;
+    setValue('icon', iconValue);
+    if (isNewIcon) {
+      setValue('url', '');
+      setValue('whatsappNumber', '');
+      setValue('emailAddress', '');
+      const icon = LINK_ICONS.find((i) => i.value === iconValue);
+      if (icon) setValue('title', icon.label);
+    }
+  };
 
   return (
     <Modal
@@ -162,7 +185,67 @@ export function LinkEditorModal({
             )}
           </div>
         )}
-        {!isWhatsapp && (
+        {isMail && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-sm font-semibold text-slate">Destino del link</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setMailMode('email')}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
+                  mailMode === 'email'
+                    ? 'border-coral bg-coral/10 text-coral'
+                    : 'border-slate/15 bg-white text-slate/60 hover:border-orange hover:text-orange'
+                }`}
+              >
+                Email
+              </button>
+              <button
+                type="button"
+                onClick={() => setMailMode('url')}
+                className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
+                  mailMode === 'url'
+                    ? 'border-coral bg-coral/10 text-coral'
+                    : 'border-slate/15 bg-white text-slate/60 hover:border-orange hover:text-orange'
+                }`}
+              >
+                Link propio
+              </button>
+            </div>
+            {mailMode === 'email' ? (
+              <Input
+                label="Tu email"
+                type="email"
+                placeholder="hola@ejemplo.com"
+                hint="El link se genera solo y abre el correo con tu dirección."
+                {...register('emailAddress', {
+                  required: 'El email es obligatorio',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Ingresá un email válido',
+                  },
+                })}
+                error={errors.emailAddress?.message}
+              />
+            ) : (
+              <Input
+                label="URL"
+                type="url"
+                placeholder="https://ejemplo.com"
+                hint="Pegá el link completo que quieras usar."
+                {...register('url', {
+                  required: 'La URL es obligatoria',
+                  pattern: {
+                    value: /^https?:\/\/.+/,
+                    message: 'La URL debe empezar con http:// o https://',
+                  },
+                })}
+                error={errors.url?.message}
+              />
+            )}
+          </div>
+        )}
+        {!isWhatsapp && !isMail && (
           <Input
             label="URL"
             type="url"
@@ -191,7 +274,7 @@ export function LinkEditorModal({
                   return (
                     <button
                       type="button"
-                      onClick={() => field.onChange(icon.value)}
+                      onClick={() => handleIconChange(icon.value)}
                       className={`flex flex-col items-center gap-1 rounded-xl border px-2 py-2 text-xs font-medium transition-colors ${
                         selected
                           ? 'border-coral bg-coral/10 text-coral'
@@ -240,4 +323,14 @@ function getWhatsappNumber(link: Link | null): string {
 
 function buildWhatsappUrl(number: string): string {
   return `https://wa.me/${number}`;
+}
+
+function getEmailAddress(link: Link | null): string {
+  if (!link) return '';
+  const match = link.url.match(MAILTO_RE);
+  return match ? match[1] : '';
+}
+
+function buildMailtoUrl(email: string): string {
+  return `mailto:${email}`;
 }
