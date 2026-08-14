@@ -185,6 +185,10 @@ async function main() {
       rmSync(dir, { recursive: true, force: true });
       mkdirSync(dir, { recursive: true });
       writeFileSync(path.join(dir, 'index.html'), buildProfileHtml(template, username, profile), 'utf8');
+      const atDir = path.join(DIST, `@${username}`);
+      rmSync(atDir, { recursive: true, force: true });
+      mkdirSync(atDir, { recursive: true });
+      writeFileSync(path.join(atDir, 'index.html'), buildProfileHtml(template, username, profile), 'utf8');
       generated += 1;
       console.log(`  ✓ ${username}`);
     } catch (err) {
