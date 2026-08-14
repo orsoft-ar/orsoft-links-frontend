@@ -7,6 +7,7 @@ interface SeoOptions {
   path?: string;
   imageUrl?: string | null;
   type?: string;
+  noIndex?: boolean;
 }
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string): void {
@@ -29,13 +30,19 @@ function upsertLink(rel: string, href: string): void {
   el.setAttribute('href', href);
 }
 
-function upsertJsonLd(id: string, data: Record<string, unknown>): void {
-  let el = document.getElementById(id) as HTMLScriptElement | null;
+function upsertJsonLd(id: string, data: Record<string, unknown> | null): void {
+  const el = document.getElementById(id) as HTMLScriptElement | null;
+  if (!data) {
+    el?.remove();
+    return;
+  }
   if (!el) {
-    el = document.createElement('script');
-    el.type = 'application/ld+json';
-    el.id = id;
-    document.head.appendChild(el);
+    const node = document.createElement('script');
+    node.type = 'application/ld+json';
+    node.id = id;
+    document.head.appendChild(node);
+    node.textContent = JSON.stringify(data);
+    return;
   }
   el.textContent = JSON.stringify(data);
 }
@@ -46,11 +53,13 @@ export function useSeo({
   path = '/',
   imageUrl,
   type = 'website',
+  noIndex = false,
 }: SeoOptions): void {
   const url = `${SITE_URL}${path}`;
 
   document.title = title;
   upsertLink('canonical', url);
+  if (noIndex) upsertMeta('name', 'robots', 'noindex, nofollow');
 
   upsertMeta('name', 'description', description ?? '');
   upsertMeta('property', 'og:title', title);
@@ -66,7 +75,7 @@ export function useSeo({
   if (imageUrl) upsertMeta('name', 'twitter:image', imageUrl);
 }
 
-export function useJsonLd(id: string, data: Record<string, unknown>): void {
+export function useJsonLd(id: string, data: Record<string, unknown> | null): void {
   upsertJsonLd(id, data);
 }
 

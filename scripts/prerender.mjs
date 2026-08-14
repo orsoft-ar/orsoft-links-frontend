@@ -139,7 +139,7 @@ function buildProfileHtml(template, username, profile) {
 
   html = html.replace(
     /(<script type="application\/ld\+json">)/,
-    `${watermark}\n    <script type="application/ld+json">${escapeJsonLd(jsonLd)}</script>\n    <script type="application/ld+json">`,
+    `${watermark}\n    <script type="application/ld+json" id="profile-jsonld">${escapeJsonLd(jsonLd)}</script>\n    <script type="application/ld+json">`,
   );
 
   html = html.replace('<div id="root"></div>', `<div id="root">${rootHtml.replace(/\n/g, '')}</div>`);

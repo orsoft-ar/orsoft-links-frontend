@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/Loading';
 import * as publicService from '@/services/public.service';
 import type { PublicLinkPage } from '@/types/linkPage';
 import { getErrorMessage } from '@/utils/format';
-import { useJsonLd, useSeo } from '@/utils/seo';
+import { useJsonLd, useSeo, SITE_URL } from '@/utils/seo';
 
 const DEFAULT_PROFILE_DESCRIPTION =
   'Mirá todos mis links, redes y contacto en un solo lugar.';
@@ -31,20 +31,26 @@ export function PublicProfilePage() {
       : (page?.description ?? DEFAULT_PROFILE_DESCRIPTION),
     path: `/${username}`,
     imageUrl: page?.profileImageUrl,
+    noIndex: Boolean(notFound || error),
   });
 
-  useJsonLd('profile-jsonld', {
-    '@context': 'https://schema.org',
-    '@type': 'ProfilePage',
-    mainEntity: {
-      '@type': 'Person',
-      name: page?.title || page?.username,
-      description: page?.description,
-      url: page ? `/${page.username}` : undefined,
-      image: page?.profileImageUrl,
-      sameAs: page?.links.map((link) => link.url),
-    },
-  });
+  useJsonLd(
+    'profile-jsonld',
+    page && !notFound && !error
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ProfilePage',
+          mainEntity: {
+            '@type': 'Person',
+            name: page.title || page.username,
+            description: page.description,
+            url: `${SITE_URL}/${page.username}`,
+            image: page.profileImageUrl,
+            sameAs: page.links.map((link) => link.url),
+          },
+        }
+      : null,
+  );
 
   useEffect(() => {
     let active = true;
