@@ -12,14 +12,25 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
+      }}
+    >
       <div
         className="absolute inset-0 bg-navy/60 backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
       <div className="relative z-10 flex max-h-[90vh] w-full flex-col rounded-t-2xl bg-cream p-5 shadow-2xl ring-1 ring-slate/10 sm:max-h-[80vh] sm:max-w-lg sm:rounded-2xl sm:p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-navy">{title}</h2>
+          <h2 id="modal-title" className="text-lg font-bold text-navy">
+            {title}
+          </h2>
           <button
             onClick={onClose}
             aria-label="Cerrar"

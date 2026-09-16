@@ -17,7 +17,12 @@ export function CookieBanner() {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-4">
+    <div
+      className="fixed inset-x-0 bottom-0 z-50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4"
+      role="dialog"
+      aria-live="polite"
+      aria-label="Consentimiento de cookies"
+    >
       <div className="mx-auto w-full max-w-3xl rounded-2xl border border-navy/10 bg-navy p-4 text-cream shadow-2xl">
         <p className="text-sm leading-relaxed">
           Usamos cookies para medir las visitas y mejorar la experiencia. Necesitamos tu consentimiento

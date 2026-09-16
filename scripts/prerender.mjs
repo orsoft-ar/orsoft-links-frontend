@@ -60,6 +60,10 @@ function buildProfileHtml(template, username, profile) {
   <div class="pr-links">${linksHtml || '<p class="pr-empty">Todavía no hay links publicados</p>'}</div>
 </main>`;
 
+  const validSameAs = (profile.links ?? [])
+    .map((l) => l.url)
+    .filter((url) => /^https:\/\//.test(url));
+
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -73,7 +77,7 @@ function buildProfileHtml(template, username, profile) {
       url: pageUrl,
       description,
       image,
-      sameAs: (profile.links ?? []).map((l) => l.url),
+      sameAs: validSameAs,
     },
   });
 
@@ -137,6 +141,12 @@ function buildProfileHtml(template, username, profile) {
     .pr-link{border-radius:1rem;background:#002b5b;color:#fff;font-weight:600;padding:.875rem;text-decoration:none}
   </style>`;
 
+  // Remove FAQPage for profile (irrelevant, would mislead)
+  html = html.replace(
+    /<script type="application\/ld\+json">\s*\{\s*"@context":\s*"https:\/\/schema\.org",\s*"@type":\s*"FAQPage"[\s\S]*?<\/script>\s*/,
+    '',
+  );
+
   html = html.replace(
     /(<script type="application\/ld\+json">)/,
     `${watermark}\n    <script type="application/ld+json" id="profile-jsonld">${escapeJsonLd(jsonLd)}</script>\n    <script type="application/ld+json">`,
@@ -155,8 +165,6 @@ function buildSitemapXml(usernames, lastModified) {
     `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastModified}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
   const entries = [
     url(`${SITE_URL}/`, '1.0'),
-    url(`${SITE_URL}/login`, '0.3'),
-    url(`${SITE_URL}/register`, '0.5'),
     ...usernames.map((username) => url(`${SITE_URL}/${username}`, '0.8')),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;

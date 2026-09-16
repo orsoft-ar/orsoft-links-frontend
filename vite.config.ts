@@ -14,8 +14,8 @@ function robotsTxtPlugin(): Plugin {
     },
     closeBundle() {
       const env = loadEnv('production', path.resolve(__dirname), '');
-      const apiUrl = (env.VITE_API_URL ?? 'https://linkorsoft.site').replace(/\/+$/, '');
-      const sitemapUrl = `${apiUrl}/public/sitemap.xml`;
+      const publicUrl = (env.VITE_PUBLIC_URL ?? 'https://linkorsoft.site').replace(/\/+$/, '');
+      const sitemapUrl = `${publicUrl}/sitemap.xml`;
       const robots = `User-agent: *
 Allow: /
 Disallow: /dashboard
@@ -35,6 +35,16 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          dnd: ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+        },
+      },
     },
   },
   server: {

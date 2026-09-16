@@ -5,7 +5,7 @@ type ConsentValue = 'granted' | 'denied';
 
 function gtag(...args: unknown[]): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).dataLayer?.push(args);
+  (window as any).dataLayer?.push(...args);
 }
 
 function hasScript(): boolean {

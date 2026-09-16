@@ -12,6 +12,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   ref,
 ) {
   const inputId = id ?? props.name;
+  const hintId = hint ? `${inputId}-hint` : undefined;
+  const errorId = error ? `${inputId}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -22,6 +25,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <input
         ref={ref}
         id={inputId}
+        aria-invalid={Boolean(error)}
+        aria-describedby={describedBy}
         className={`rounded-xl border bg-white px-4 py-2.5 text-slate outline-none transition-colors placeholder:text-slate/40 focus:ring-2 ${
           error
             ? 'border-coral focus:border-coral focus:ring-coral/20'
@@ -29,8 +34,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         } ${className}`}
         {...props}
       />
-      {hint && !error && <span className="text-xs text-slate/50">{hint}</span>}
-      {error && <span className="text-xs font-medium text-coral">{error}</span>}
+      {hint && !error && (
+        <span id={hintId} className="text-xs text-slate/50">
+          {hint}
+        </span>
+      )}
+      {error && (
+        <span id={errorId} role="alert" className="text-xs font-medium text-coral">
+          {error}
+        </span>
+      )}
     </div>
   );
 });
@@ -45,6 +58,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   ref,
 ) {
   const inputId = id ?? props.name;
+  const errorId = error ? `${inputId}-error` : undefined;
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -56,6 +70,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
         ref={ref}
         id={inputId}
         rows={props.rows ?? 3}
+        aria-invalid={Boolean(error)}
+        aria-describedby={errorId}
         className={`rounded-xl border bg-white px-4 py-2.5 text-slate outline-none transition-colors placeholder:text-slate/40 focus:ring-2 ${
           error
             ? 'border-coral focus:border-coral focus:ring-coral/20'
@@ -63,7 +79,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
         } ${className}`}
         {...props}
       />
-      {error && <span className="text-xs font-medium text-coral">{error}</span>}
+      {error && (
+        <span id={errorId} role="alert" className="text-xs font-medium text-coral">
+          {error}
+        </span>
+      )}
     </div>
   );
 });

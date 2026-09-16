@@ -47,6 +47,10 @@ function upsertJsonLd(id: string, data: Record<string, unknown> | null): void {
   el.textContent = JSON.stringify(data);
 }
 
+function removeMeta(attr: 'name' | 'property', key: string): void {
+  document.head.querySelector(`meta[${attr}="${key}"]`)?.remove();
+}
+
 export function useSeo({
   title,
   description,
@@ -59,7 +63,11 @@ export function useSeo({
 
   document.title = title;
   upsertLink('canonical', url);
-  if (noIndex) upsertMeta('name', 'robots', 'noindex, nofollow');
+  if (noIndex) {
+    upsertMeta('name', 'robots', 'noindex, nofollow');
+  } else {
+    upsertMeta('name', 'robots', 'index, follow, max-image-preview:large');
+  }
 
   upsertMeta('name', 'description', description ?? '');
   upsertMeta('property', 'og:title', title);
@@ -67,12 +75,20 @@ export function useSeo({
   upsertMeta('property', 'og:type', type);
   upsertMeta('property', 'og:site_name', SITE_NAME);
   if (description) upsertMeta('property', 'og:description', description);
-  if (imageUrl) upsertMeta('property', 'og:image', imageUrl);
+  if (imageUrl) {
+    upsertMeta('property', 'og:image', imageUrl);
+  } else {
+    removeMeta('property', 'og:image');
+  }
 
   upsertMeta('name', 'twitter:card', imageUrl ? 'summary_large_image' : 'summary');
   upsertMeta('name', 'twitter:title', title);
   if (description) upsertMeta('name', 'twitter:description', description);
-  if (imageUrl) upsertMeta('name', 'twitter:image', imageUrl);
+  if (imageUrl) {
+    upsertMeta('name', 'twitter:image', imageUrl);
+  } else {
+    removeMeta('name', 'twitter:image');
+  }
 }
 
 export function useJsonLd(id: string, data: Record<string, unknown> | null): void {
